@@ -59,7 +59,17 @@ const VFBUploader = (props) => {
     setState({...state, open: true });
   }
 
+  /*
+   * A real template must be chosen: the upload name is "<template>&<id>" and the
+   * pipeline can only search a template it knows ("" and the "Select" placeholder
+   * both arrive as uploads it has to reject).
+   */
+  const templateChosen = () => configuration.templates.some(template => template.label === state.templateSelected);
+
   const handleNBLASTAction = () => {
+    if (!templateChosen()) {
+      return;
+    }
     let newId = "VFBu_" + nanoid(8);
     let url = configuration.nblastURL.replace(UNIQUE_ID, state.templateSelected + "&" + newId);
     var formData = new FormData();
@@ -261,7 +271,7 @@ const VFBUploader = (props) => {
               <Grid item xs={12}>
                 <Button
                   fullWidth
-                  disabled={state.files.length == 0 || state.uploading}
+                  disabled={state.files.length == 0 || !templateChosen() || state.uploading}
                   onClick={handleNBLASTAction}
                   variant="contained"
                   classes={{ root : classes.nblastButton }}
