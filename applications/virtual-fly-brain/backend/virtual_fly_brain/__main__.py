@@ -108,7 +108,7 @@ def init_webapp_routes(app):
             return flask.jsonify({'error': 'Missing required parameter: short_form'}), 400
 
         try:
-            result = vfb.get_instances(short_form)
+            result = vfb.get_instances(short_form, return_dataframe=False)
             if isinstance(result, pd.DataFrame):
                 result = result.to_dict(orient='records')
             elif isinstance(result, pd.Series):
