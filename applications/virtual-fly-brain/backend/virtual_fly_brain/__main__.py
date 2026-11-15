@@ -108,12 +108,16 @@ def init_webapp_routes(app):
             return flask.jsonify({'error': 'Missing required parameter: short_form'}), 400
 
         try:
-            result = vfb.get_instances(short_form)
+            result = vfb.get_instances(short_form, return_dataframe=False)
             if isinstance(result, pd.DataFrame):
                 result = result.to_dict(orient='records')
             elif isinstance(result, pd.Series):
                 result = result.to_dict()
-            return flask.jsonify(result)
+            # NumpyEncoder: the row count comes back as a numpy integer, which jsonify cannot serialise
+            return flask.Response(
+                json.dumps(result, cls=NumpyEncoder),
+                mimetype='application/json'
+            )
         except Exception as e:
             return flask.jsonify({'error': str(e)}), 500
 
