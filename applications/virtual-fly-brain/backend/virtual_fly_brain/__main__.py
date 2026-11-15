@@ -113,7 +113,11 @@ def init_webapp_routes(app):
                 result = result.to_dict(orient='records')
             elif isinstance(result, pd.Series):
                 result = result.to_dict()
-            return flask.jsonify(result)
+            # NumpyEncoder: the row count comes back as a numpy integer, which jsonify cannot serialise
+            return flask.Response(
+                json.dumps(result, cls=NumpyEncoder),
+                mimetype='application/json'
+            )
         except Exception as e:
             return flask.jsonify({'error': str(e)}), 500
 
